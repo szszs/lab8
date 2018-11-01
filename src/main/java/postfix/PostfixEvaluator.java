@@ -13,7 +13,11 @@ import java.util.Stack;
  *
  */
 public class PostfixEvaluator {
-	
+	private static final String PLUS     = "+";
+	private static final String MINUS    = "-";
+	private static final String MULTIPLY = "*";
+	private static final String DIVIDE   = "/";
+
 	private String arithmeticExpr;
 	
 	/**
@@ -37,28 +41,45 @@ public class PostfixEvaluator {
 	 * 	a valid expression in Postfix notation
 	 */
 	double eval( ) throws MalformedExpressionException {
-		// TODO: Implement this method.
-		// The code provided here is for illustration only, and
-		// can be deleted when you write your implementation.
-
-		// Using a stack makes it very simple to evaluate the
-		// arithmetic expression.
-		// See http://docs.oracle.com/javase/8/docs/api/java/util/Stack.html
-		
-		// Use the Scanner to get the elements (tokens) in the
-		// arithmetic expression.
-		
+		Stack<Double> operands = new Stack<Double>();
 		Scanner scanner = new Scanner(arithmeticExpr);
-		Token currToken = scanner.getToken();
+
+		while (!scanner.isEmpty()) {
+			Token currToken = scanner.getToken();
+			if (currToken.isDouble()) {
+				operands.push(currToken.getValue());
+			} else {
+				// evaluate expression so far
+				double operand2;
+				double operand1;
+				if (operands.empty()) {
+					throw new MalformedExpressionException();
+				} else {
+					operand2 = operands.pop();
+					if (operands.empty()) {
+						throw new MalformedExpressionException();
+					} else {
+						operand1 = operands.pop();
+					}
+				}
+
+				String operator = currToken.getName();
+				if (operator.equals(PLUS)) {
+					operands.push(operand1 + operand2);
+				} else if (operator.equals(MINUS)) {
+					operands.push(operand1 - operand2);
+				} else if (operator.equals(MULTIPLY)) {
+					operands.push(operand1 * operand2);
+				} else if (operator.equals(DIVIDE)) {
+					operands.push(operand1 / operand2);
+				} else {
+					throw new MalformedExpressionException();
+				}
+			}
+			scanner.eatToken();
+		}
 		
-		// now process the token, etc.
-		// You should read the implementation of the Token class
-		// to determine what methods you can and should use.
-		
-		// It is sufficient to support the four basic operations:
-		// addition, subtraction, multiplication & division.
-		
-		return 0.0;
+		return operands.peek();
 	}
 	
 }
